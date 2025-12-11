@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alberta Housing Project Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f5f7fa;
+        color: #2d3748;
+        line-height: 1.5;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .header {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+        color: #1a365d;
+        margin-bottom: 12px;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .subtitle {
+        color: #4a5568;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .controls {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .btn {
+        background: #3182ce;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s;
+    }
+
+    .btn:hover {
+        background: #2c5282;
+    }
+
+    .btn.danger {
+        background: #e53e3e;
+    }
+
+    .btn.danger:hover {
+        background: #c53030;
+    }
+
+    .btn.secondary {
+        background: #4a5568;
+    }
+
+    .btn.secondary:hover {
+        background: #2d3748;
+    }
+
+    .search-container {
+        position: relative;
+        flex-grow: 1;
+        max-width: 300px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .keyboard-hint {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 12px;
+        color: #a0aec0;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: top;
+        min-width: 120px;
+    }
+
+    .table th {
+        background: #f7fafc;
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 13px;
+        position: sticky;
+        top: 0;
+    }
+
+    .table td {
+        font-size: 13px;
+        max-width: 200px;
+        word-wrap: break-word;
+    }
+
+    .table tr:hover {
+        background: #f7fafc;
+    }
+
+    .field-title {
+        font-weight: 500;
+        color: #2d3748;
+    }
+
+    .field-subtitle {
+        font-size: 11px;
+        color: #718096;
+        margin-top: 2px;
+    }
+
+    .input-cell {
+        position: relative;
+    }
+
+    .cell-input {
+        width: 100%;
+        border: 1px solid transparent;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 13px;
+        background: transparent;
+        min-height: 20px;
+    }
+
+    .cell-input:focus {
+        outline: none;
+        border-color: #3182ce;
+        background: white;
+    }
+
+    .actions-cell {
+        min-width: 100px;
+    }
+
+    .evidence-btn {
+        background: #38a169;
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-right: 8px;
+    }
+
+    .evidence-btn:hover {
+        background: #2f855a;
+    }
+
+    .delete-btn {
+        background: #e53e3e;
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .delete-btn:hover {
+        background: #c53030;
+    }
+
+    .footer-info {
+        margin-top: 16px;
+        font-size: 12px;
+        color: #718096;
+    }
+
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        margin-bottom: 16px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .form-textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    .file-input {
+        display: none;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #718096;
+    }
+
+    .empty-state h3 {
+        margin-bottom: 8px;
+        color: #4a5568;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 16px;
+        }
+        
+        .controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .search-container {
+            max-width: none;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .table {
+            min-width: 800px;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Housing Project Tracker</h1>
+            <div class="subtitle">— Click‑to‑Evidence</div>
+
+```
+        <div class="controls">
+            <button class="btn" onclick="addEntry()">➕ Add Entry</button>
+            <button class="btn secondary" onclick="exportJSON()">⬇️ Export JSON</button>
+            <button class="btn secondary" onclick="importJSON()">⬆️ Import JSON</button>
+            <button class="btn secondary" onclick="exportCSV()">🧾 Export CSV</button>
+            <button class="btn danger" onclick="clearAll()">🗑️ Clear All</button>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Focus search" onkeyup="searchEntries()">
+                <span class="keyboard-hint">Ctrl/⌘+K</span>
+            </div>
+        </div>
+        
+        <div class="footer-info">
+            <strong>Fields tracked:</strong> RFP / RFQ title (BCH stream; site ref), Jurisdiction (city/province), federal land ID, Units (target), tenure mix, Delivery method, Financing stack, Shortlist / Proponent, Award, Related MCRs (±14 days), Groundbreaking / PC window. Use the 📎 Evidence button per row to attach registries, PDFs, news, hashes, and notes.
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>
+                        <div class="field-title">RFP / RFQ title</div>
+                        <div class="field-subtitle">(BCH stream; site ref)</div>
+                    </th>
+                    <th>
+                        <div class="field-title">Jurisdiction</div>
+                        <div class="field-subtitle">(city/province; Fed Land ID)</div>
+                    </th>
+                    <th>
+                        <div class="field-title">Units / Tenure mix</div>
+                        <div class="field-subtitle">(supportive / affordable / mid‑market)</div>
+                    </th>
+                    <th>
+                        <div class="field-title">Delivery method</div>
+                        <div class="field-subtitle">(modular / off‑site / mass timber)</div>
+                    </th>
+                    <th>
+                        <div class="field-title">Financing stack</div>
+                        <div class="field-subtitle">(BCH; CMHC; muni; private)</div>
+                    </th>
+                    <th>
+                        <div class="field-title">Shortlist / Proponent</div>
+                        <div class="field-subtitle">(developer; builder; operator)</div>
+                    </th>
+                    <th>
+                        <div class="field-title">Award</div>
+                        <div class="field-subtitle">(date; amount; covenants)</div>
+                    </th>
+                    <th>
+                        <div class="field-title">Related MCRs ±14d</div>
+                        <div class="field-subtitle">(links)</div>
+                    </th>
+                    <th>
+                        <div class="field-title">Groundbreaking / PC</div>
+                        <div class="field-subtitle">(dates / window)</div>
+                    </th>
+                    <th>Evidence</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="projectTable">
+                <tr>
+                    <td colspan="12" class="empty-state">
+                        <h3>No projects yet</h3>
+                        <p>Click "Add Entry" to start tracking housing projects</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="footer-info" style="margin-top: 16px;">
+        Data is stored locally in your browser (localStorage). Export regularly for backups.<br>
+        <strong>Tip:</strong> Focus search <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd> • Save row <kbd>Enter</kbd>
+    </div>
+</div>
+
+<!-- Evidence Modal -->
+<div class="modal" id="evidenceModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Evidence & Documentation</h3>
+            <p>Attach registries, PDFs, news, hashes, and notes</p>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea class="form-input form-textarea" id="evidenceNotes" placeholder="Add detailed notes, observations, or documentation references..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Document Links</label>
+            <textarea class="form-input" id="evidenceLinks" placeholder="Add URLs to registries, PDFs, news articles (one per line)"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">File Hashes</label>
+            <textarea class="form-input" id="evidenceHashes" placeholder="Add document hashes for verification"></textarea>
+        </div>
+        
+        <div class="modal-actions">
+            <button class="btn secondary" onclick="closeEvidenceModal()">Cancel</button>
+            <button class="btn" onclick="saveEvidence()">Save Evidence</button>
+        </div>
+    </div>
+</div>
+
+<!-- File input for import -->
+<input type="file" id="fileInput" class="file-input" accept=".json" onchange="handleFileImport(event)">
+
+<script>
+    let projects = [];
+    let currentEvidenceIndex = -1;
+
+    // Load data from localStorage
+    function loadData() {
+        const saved = localStorage.getItem('housingTracker');
+        if (saved) {
+            projects = JSON.parse(saved);
+            renderTable();
+        }
+    }
+
+    // Save data to localStorage
+    function saveData() {
+        localStorage.setItem('housingTracker', JSON.stringify(projects));
+    }
+
+    // Create empty project structure
+    function createEmptyProject() {
+        return {
+            id: Date.now(),
+            rfpTitle: '',
+            jurisdiction: '',
+            unitstenure: '',
+            deliveryMethod: '',
+            financingStack: '',
+            shortlistProponent: '',
+            award: '',
+            relatedMCRs: '',
+            groundbreaking: '',
+            evidence: {
+                notes: '',
+                links: '',
+                hashes: ''
+            }
+        };
+    }
+
+    // Add new entry
+    function addEntry() {
+        const newProject = createEmptyProject();
+        projects.unshift(newProject);
+        saveData();
+        renderTable();
+        
+        // Focus on the first input of the new row
+        setTimeout(() => {
+            const firstInput = document.querySelector(`#row-${newProject.id} input`);
+            if (firstInput) firstInput.focus();
+        }, 100);
+    }
+
+    // Render table
+    function renderTable() {
+        const tbody = document.getElementById('projectTable');
+        
+        if (projects.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="12" class="empty-state">
+                        <h3>No projects yet</h3>
+                        <p>Click "Add Entry" to start tracking housing projects</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = projects.map((project, index) => `
+            <tr id="row-${project.id}">
+                <td>${index + 1}</td>
+                <td class="input-cell">
+                    <input type="text" class="cell-input" value="${project.rfpTitle}" 
+                           onchange="updateProject(${project.id}, 'rfpTitle', this.value)"
+                           onkeypress="handleEnterKey(event)">
+                </td>
+                <td class="input-cell">
+                    <input type="text" class="cell-input" value="${project.jurisdiction}" 
+                           onchange="updateProject(${project.id}, 'jurisdiction', this.value)"
+                           onkeypress="handleEnterKey(event)">
+                </td>
+                <td class="input-cell">
+                    <input type="text" class="cell-input" value="${project.unitstenure}" 
+                           onchange="updateProject(${project.id}, 'unitstenure', this.value)"
+                           onkeypress="handleEnterKey(event)">
+                </td>
+                <td class="input-cell">
+                    <input type="text" class="cell-input" value="${project.deliveryMethod}" 
+                           onchange="updateProject(${project.id}, 'deliveryMethod', this.value)"
+                           onkeypress="handleEnterKey(event)">
+                </td>
+                <td class="input-cell">
+                    <input type="text" class="cell-input" value="${project.financingStack}" 
+                           onchange="updateProject(${project.id}, 'financingStack', this.value)"
+                           onkeypress="handleEnterKey(event)">
+                </td>
+                <td class="input-cell">
+                    <input type="text" class="cell-input" value="${project.shortlistProponent}" 
+                           onchange="updateProject(${project.id}, 'shortlistProponent', this.value)"
+                           onkeypress="handleEnterKey(event)">
+                </td>
+                <td class="input-cell">
+                    <input type="text" class="cell-input" value="${project.award}" 
+                           onchange="updateProject(${project.id}, 'award', this.value)"
+                           onkeypress="handleEnterKey(event)">
+                </td>
+                <td class="input-cell">
+                    <input type="text" class="cell-input" value="${project.relatedMCRs}" 
+                           onchange="updateProject(${project.id}, 'relatedMCRs', this.value)"
+                           onkeypress="handleEnterKey(event)">
+                </td>
+                <td class="input-cell">
+                    <input type="text" class="cell-input" value="${project.groundbreaking}" 
+                           onchange="updateProject(${project.id}, 'groundbreaking', this.value)"
+                           onkeypress="handleEnterKey(event)">
+                </td>
+                <td class="actions-cell">
+                    <button class="evidence-btn" onclick="openEvidenceModal(${index})">📎 Evidence</button>
+                </td>
+                <td class="actions-cell">
+                    <button class="delete-btn" onclick="deleteProject(${project.id})">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Update project data
+    function updateProject(id, field, value) {
+        const projectIndex = projects.findIndex(p => p.id === id);
+        if (projectIndex !== -1) {
+            projects[projectIndex][field] = value;
+            saveData();
+        }
+    }
+
+    // Handle Enter key for saving
+    function handleEnterKey(event) {
+        if (event.key === 'Enter') {
+            event.target.blur();
+        }
+    }
+
+    // Delete project
+    function deleteProject(id) {
+        if (confirm('Are you sure you want to delete this project?')) {
+            projects = projects.filter(p => p.id !== id);
+            saveData();
+            renderTable();
+        }
+    }
+
+    // Open evidence modal
+    function openEvidenceModal(index) {
+        currentEvidenceIndex = index;
+        const project = projects[index];
+        
+        document.getElementById('evidenceNotes').value = project.evidence.notes;
+        document.getElementById('evidenceLinks').value = project.evidence.links;
+        document.getElementById('evidenceHashes').value = project.evidence.hashes;
+        
+        document.getElementById('evidenceModal').classList.add('show');
+    }
+
+    // Close evidence modal
+    function closeEvidenceModal() {
+        document.getElementById('evidenceModal').classList.remove('show');
+        currentEvidenceIndex = -1;
+    }
+
+    // Save evidence
+    function saveEvidence() {
+        if (currentEvidenceIndex !== -1) {
+            const project = projects[currentEvidenceIndex];
+            project.evidence.notes = document.getElementById('evidenceNotes').value;
+            project.evidence.links = document.getElementById('evidenceLinks').value;
+            project.evidence.hashes = document.getElementById('evidenceHashes').value;
+            
+            saveData();
+            closeEvidenceModal();
+        }
+    }
+
+    // Search functionality
+    function searchEntries() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#projectTable tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm) || searchTerm === '') {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Export JSON
+    function exportJSON() {
+        const dataStr = JSON.stringify(projects, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = `housing_tracker_${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+    }
+
+    // Import JSON
+    function importJSON() {
+        document.getElementById('fileInput').click();
+    }
+
+    // Handle file import
+    function handleFileImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (Array.isArray(importedData)) {
+                    if (confirm('This will replace all current data. Are you sure?')) {
+                        projects = importedData;
+                        saveData();
+                        renderTable();
+                    }
+                } else {
+                    alert('Invalid file format. Please select a valid JSON export file.');
+                }
+            } catch (error) {
+                alert('Error reading file. Please select a valid JSON file.');
+            }
+        };
+        reader.readAsText(file);
+        
+        // Reset file input
+        event.target.value = '';
+    }
+
+    // Export CSV
+    function exportCSV() {
+        if (projects.length === 0) {
+            alert('No data to export');
+            return;
+        }
+        
+        const headers = [
+            'RFP/RFQ Title',
+            'Jurisdiction',
+            'Units/Tenure Mix',
+            'Delivery Method',
+            'Financing Stack',
+            'Shortlist/Proponent',
+            'Award',
+            'Related MCRs',
+            'Groundbreaking/PC',
+            'Evidence Notes',
+            'Evidence Links',
+            'Evidence Hashes'
+        ];
+        
+        const csvContent = [
+            headers.join(','),
+            ...projects.map(project => [
+                `"${project.rfpTitle.replace(/"/g, '""')}"`,
+                `"${project.jurisdiction.replace(/"/g, '""')}"`,
+                `"${project.unitstenure.replace(/"/g, '""')}"`,
+                `"${project.deliveryMethod.replace(/"/g, '""')}"`,
+                `"${project.financingStack.replace(/"/g, '""')}"`,
+                `"${project.shortlistProponent.replace(/"/g, '""')}"`,
+                `"${project.award.replace(/"/g, '""')}"`,
+                `"${project.relatedMCRs.replace(/"/g, '""')}"`,
+                `"${project.groundbreaking.replace(/"/g, '""')}"`,
+                `"${project.evidence.notes.replace(/"/g, '""')}"`,
+                `"${project.evidence.links.replace(/"/g, '""')}"`,
+                `"${project.evidence.hashes.replace(/"/g, '""')}"`
+            ].join(','))
+        ].join('\n');
+        
+        const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+        const exportFileDefaultName = `housing_tracker_${new Date().toISOString().split('T')[0]}.csv`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+    }
+
+    // Clear all data
+    function clearAll() {
+        if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+            projects = [];
+            saveData();
+            renderTable();
+        }
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K for search focus
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            document.getElementById('searchInput').focus();
+        }
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('evidenceModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEvidenceModal();
+        }
+    });
+
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', function() {
+        loadData();
+    });
+</script>
+```
+
+</body>
+</html>
